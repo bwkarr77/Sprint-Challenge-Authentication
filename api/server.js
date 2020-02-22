@@ -9,7 +9,6 @@ const server = express();
 configureMiddleware(server);
 
 server.use("/api/auth", authRouter);
-// server.use("/api/jokes", jokesRouter);
 server.use("/api/jokes", restricted, jokesRouter);
 
 server.get("/api", (req, res) => {

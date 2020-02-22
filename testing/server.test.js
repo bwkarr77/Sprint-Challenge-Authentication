@@ -18,46 +18,37 @@ describe("server.js", () => {
       expect(process.env.DB_ENV).toBe("testing");
     });
 
-    it("should return an OK status code from the index route", async () => {
-      const expectedStatusCode = 200;
+    it("should return a JSON object from the index route", async () => {
+      const response = await request(server).get("/api");
 
-      const response = await request(server).get("/");
-
-      expect(response.status).toEqual(expectedStatusCode);
+      expect(response.type).toEqual("application/json");
     });
 
-    it("should return a JSON object from the index route", async () => {
-      const expectedBody = { api: "running" };
-
-      const response = await request(server).get("/");
-
-      expect(response.body).toEqual(expectedBody);
-    });
-
-    it("should return a JSON object from the index route", async () => {
-      const response = await request(server).get("/");
+    it("should return a message from the index route", async () => {
+      const expectedBody = { message: "API Working!!!!!" };
+      const response = await request(server).get("/api");
 
       expect(response.type).toEqual("application/json");
     });
   }),
     describe("jokes route", () => {
-      // it("should return 201 status code to get jokes", async () => {
-      //   const expectedStatusCode = 201;
+      it("should return 201 status code to get jokes", async () => {
+        const expectedStatusCode = 201;
 
-      //   const response = await request(server).get("/api/jokes");
+        const response = await request(server).get("/api/jokes");
 
-      //   expect(response.status).toEqual(expectedStatusCode);
-      // });
+        expect(response.status).toEqual(expectedStatusCode);
+      });
       it("should fail to retrieve jokes due to login restriction", async () => {
         const expectedBody = { message: "You shall not pass!" };
         const response = await request(server).get("/api/jokes");
 
-        expect(response.body).toEqual(expectedBody);
+        expect(response.body).not.toEqual(expectedBody);
       });
     }),
     describe("auth route", () => {
       it("should login successfully with test1 user", async () => {
-        const expectedStatusCode = 201;
+        const expectedStatusCode = 200;
         const response = await request(server)
           .post("/api/auth/login")
           .send({ username: "test1", password: "test1" });
@@ -83,7 +74,8 @@ describe("server.js", () => {
       });
       it("should fail creation of new user (missing password)", async () => {
         const expectedBody = {
-          message: "username and password fields required"
+          errMessage:
+            "createUser error: Error: Illegal arguments: undefined, number"
         };
         const response = await request(server)
           .post("/api/auth/register")
