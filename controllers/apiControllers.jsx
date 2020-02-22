@@ -5,7 +5,6 @@ const Users = require("../utils/db-model.js");
 const secrets = require("../utils/secrets.js");
 
 const generateToken = user => {
-  //====1st way of writing it....=====
   const payload = {
     //list of "claims"; aka permissions for user
     subject: user.id,
@@ -29,10 +28,8 @@ exports.createUser = (req, res, next) => {
 
   Users.add(user)
     .then(newUser => {
-      console.log("createUser.step1");
+      console.log("createUser");
       const newUserToken = generateToken(newUser);
-      console.log("createUser.step2");
-
       res
         .status(201) //success
         .json({
@@ -53,8 +50,8 @@ exports.createUser = (req, res, next) => {
 // @desc    login with credentials in header
 // @route   POST to /api/auth/login
 exports.userLogin = (req, res, next) => {
-  // let { user, loggedin } = req.session;
-  // const loginUserToken = generateToken(user);
+  let user = req.body;
+  const loginUserToken = generateToken(user);
 
   console.log(
     "userControllers>userLogin:",
@@ -76,8 +73,7 @@ exports.userLogin = (req, res, next) => {
 exports.getAllUsers = (req, res, next) => {
   console.log("getAllUsers");
   Users.find()
-    // Users.find()
-    // .orderBy("id")
+    .orderBy("id")
     .then(users => {
       console.log("getAllUser.then(users):", users);
       res
@@ -88,7 +84,6 @@ exports.getAllUsers = (req, res, next) => {
       res
         .status(500) //server error
         .json({ errMessage: `${err}` });
-      // next(err);
     });
 };
 
@@ -104,12 +99,11 @@ exports.logout = (req, res, next) => {
       if (err) {
         res
           .send(401) //error
-          .json({ errMessage: "errors for days!" });
+          .json({ errMessage: "Logout errors for days!" });
       } else {
         res
           .status(202) //success (?)
           .json({ message: "successful logout" });
-        console.log("logout>post:", req.session);
       }
     });
   } else {
@@ -117,6 +111,11 @@ exports.logout = (req, res, next) => {
   }
 };
 
+// ================================
+//            DELETE
+// ================================
+// @desc    DELETE to logout current user (since we are destroying req.session)
+// @route   DELETE to /api/logout
 exports.deleteUser = (req, res, next) => {
   console.log("deleteUser started...");
   const { id } = req.params;

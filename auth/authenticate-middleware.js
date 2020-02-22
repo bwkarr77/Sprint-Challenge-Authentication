@@ -11,7 +11,7 @@ const bcrypt = require("bcryptjs");
 exports.authenticate = (req, res, next) => {
   const { username, password } = req.body;
   // const { username, password } = req.headers;
-  console.log("authorize:", username, password);
+  console.log("authenticate:", username, password);
   // validate that they exist ... we didn't have this part in class...
   if (!(username && password)) {
     res.status(401).json({ message: "invalid Inputs" });
@@ -20,11 +20,7 @@ exports.authenticate = (req, res, next) => {
       .findBy({ username })
       .first()
       .then(user => {
-        //Should be a true value, but won't return true :(
         let boolRet = bcrypt.compareSync(password, user.password);
-        //
-        console.log("authRequiredMiddle.then: ", password, user, boolRet);
-        //
         if (user && boolRet) {
           req.session.user = user;
           req.session.loggedin = true;
