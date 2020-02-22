@@ -1,11 +1,22 @@
-const router = require('express').Router();
+const router = require("express").Router();
+console.log("auth-router.js");
 
-router.post('/register', (req, res) => {
-  // implement registration
-});
+const { authorize, verifyNewUser } = require("./authenticate-middleware.js");
 
-router.post('/login', (req, res) => {
-  // implement login
-});
+const {
+  createUser,
+  userLogin,
+  getAllUsers
+} = require("../controllers/apiControllers.jsx");
+
+// registration
+router.route("/register").post(createUser);
+
+// login
+router.route("/login").post(userLogin);
+// router.route("/login").post(authorize,userLogin)
+
+// getusers
+router.route("/users").get(getAllUsers);
 
 module.exports = router;
